@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #SBATCH --partition gpu
-#SBATCH --time 0-00:30
+#SBATCH --time 0-10:00
 #SBATCH --account comsm0045
 #SBATCH --mem 64GB
 #SBATCH --gres gpu:1

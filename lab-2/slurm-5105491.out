@@ -1,0 +1,18 @@
+Files already downloaded and verified
+Writing logs to logs/CNN_bs=128_lr=0.01_run_2
+Traceback (most recent call last):
+  File "lab-2.py", line 361, in <module>
+    main(parser.parse_args())
+  File "lab-2.py", line 137, in main
+    log_frequency=args.log_frequency,
+  File "lab-2.py", line 233, in train
+    logits = self.model.forward(batch)
+  File "lab-2.py", line 179, in forward
+    x = F.relu(self.conv2(x))
+  File "/mnt/storage/software/languages/anaconda/Anaconda3-2019.07/lib/python3.7/site-packages/torch/nn/modules/module.py", line 547, in __call__
+    result = self.forward(*input, **kwargs)
+  File "/mnt/storage/software/languages/anaconda/Anaconda3-2019.07/lib/python3.7/site-packages/torch/nn/modules/conv.py", line 343, in forward
+    return self.conv2d_forward(input, self.weight)
+  File "/mnt/storage/software/languages/anaconda/Anaconda3-2019.07/lib/python3.7/site-packages/torch/nn/modules/conv.py", line 340, in conv2d_forward
+    self.padding, self.dilation, self.groups)
+RuntimeError: Given groups=1, weight of size 64 3 5 5, expected input[128, 32, 16, 16] to have 3 channels, but got 32 channels instead
