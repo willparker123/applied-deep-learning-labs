@@ -1,0 +1,8 @@
+Files already downloaded and verified
+Files already downloaded and verified
+Traceback (most recent call last):
+  File "lab-4.py", line 508, in <module>
+    main(parser.parse_args())
+  File "lab-4.py", line 202, in main
+    img, label = dataset[1]
+NameError: name 'dataset' is not defined
