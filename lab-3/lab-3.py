@@ -63,7 +63,7 @@ parser.add_argument(
     type=int,
     help="How frequently to save logs to tensorboard in number of steps",
 )
-parser.add_argument(
+parser.add_argument( 
     "--print-frequency",
     default=10,
     type=int,
@@ -165,7 +165,7 @@ class CNN(nn.Module):
         self.bn2 = nn.BatchNorm2d(32)
         self.pool1 = nn.MaxPool2d(kernel_size=(2, 2), stride=(2, 2))
         self.conv2 = nn.Conv2d(
-            in_channels=self.input_shape.channels,
+            in_channels=32,
             out_channels=64,
             kernel_size=(5, 5),
             padding=(2, 2),
