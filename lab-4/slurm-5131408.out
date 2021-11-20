@@ -1,0 +1,10 @@
+Files already downloaded and verified
+Files already downloaded and verified
+<class 'PIL.Image.Image'>
+9
+Traceback (most recent call last):
+  File "lab-4.py", line 412, in <module>
+    main(parser.parse_args())
+  File "lab-4.py", line 111, in main
+    transform_test = RandomHorizontalFlip()
+NameError: name 'RandomHorizontalFlip' is not defined
