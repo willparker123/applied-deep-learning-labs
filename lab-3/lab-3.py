@@ -38,10 +38,10 @@ default_dataset_dir = Path.home() / ".cache" / "torch" / "datasets"
 parser.add_argument("--dataset-root", default=default_dataset_dir)
 parser.add_argument("--log-dir", default=Path("logs"), type=Path)
 parser.add_argument("--learning-rate", default=1e-1, type=float, help="Learning rate")
-parser.add_argument("--sgd-momentum", default=0, type=float)
+parser.add_argument("--sgd-momentum", default=0.9, type=float)
 parser.add_argument(
     "--batch-size",
-    default=64,
+    default=128,
     type=int,
     help="Number of images within each mini-batch",
 )
@@ -119,7 +119,7 @@ def main(args):
     loss_f = nn.CrossEntropyLoss()
     criterion = loss_f  #lambda logits, labels: torch.tensor(0)
     ## TASK 11: Define the optimizer
-    optimizer = optim.SGD(model.parameters(), lr=args.learning_rate, momentum=0.9)
+    optimizer = optim.SGD(model.parameters(), lr=args.learning_rate, momentum=args.sgd_momentum)
 
     log_dir = get_summary_writer_log_dir(args)
     print(f"Writing logs to {log_dir}")

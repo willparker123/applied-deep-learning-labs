@@ -25,6 +25,7 @@ from torch.optim.optimizer import Optimizer
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 from torchvision import transforms
+import torchvision
 
 import argparse
 from pathlib import Path
@@ -39,7 +40,7 @@ default_dataset_dir = Path.home() / ".cache" / "torch" / "datasets"
 parser.add_argument("--dataset-root", default=default_dataset_dir)
 parser.add_argument("--log-dir", default=Path("logs"), type=Path)
 parser.add_argument("--learning-rate", default=1e-1, type=float, help="Learning rate")
-parser.add_argument("--sgd-momentum", default=0.9, type=float)
+parser.add_argument("--sgd-momentum", default=0.9, type=float, help="SGD Momentum parameter Beta")
 parser.add_argument(
     "--batch-size",
     default=128,
@@ -78,7 +79,30 @@ parser.add_argument(
     help="Number of worker processes used to load data.",
 )
 parser.add_argument("--data-aug-hflip", action="store_true")
-
+parser.add_argument(
+    "--data-aug-brightness",
+    default=0,
+    type=float,
+    help="Brightness parameter in ColorJitter transform",
+)
+parser.add_argument(
+    "--data-aug-contrast",
+    default=0,
+    type=float,
+    help="Contrast parameter in ColorJitter transform",
+)
+parser.add_argument(
+    "--data-aug-saturation",
+    default=0,
+    type=float,
+    help="Saturation parameter in ColorJitter transform",
+)
+parser.add_argument(
+    "--data-aug-hue",
+    default=0,
+    type=float,
+    help="Hue parameter in ColorJitter transform",
+)
 
 class ImageShape(NamedTuple):
     height: int
@@ -101,14 +125,13 @@ def main(args):
         args.dataset_root, train=False, download=False, transform=transform_test
     )
 
-
     dataset_test = torchvision.datasets.CIFAR10('data', download=True, train=True)
     img, label = dataset_test[1]
     print(type(img))
     print(label)
     img
 
-    transform_test = RandomHorizontalFlip()
+    transform_test = transforms.RandomHorizontalFlip()
     for i in range(5):
       img, label = transform_test(dataset_test[i])
       print(type(img))
@@ -117,6 +140,13 @@ def main(args):
     
 
     transform = transforms.ToTensor()
+    transformList = [transforms.ToTensor()]
+    if args.data_aug_flip is True:
+        transformList.insert(0, transforms.RandomHorizontalFlip())
+    if args.data_aug_brightness is not 0:
+        transformList.insert(0, transforms.ColorJitter(brightness=args.data_aug_brightness, contrast=args.data_aug_contrast, saturation=args.data_aug_saturation, hue=args.data_aug_hue))
+    if len(transformList)>0:
+        transform = transforms.Compose(transformList)
     args.dataset_root.mkdir(parents=True, exist_ok=True)
     train_dataset = torchvision.datasets.CIFAR10(
         args.dataset_root, train=True, download=True, transform=transform
@@ -144,7 +174,7 @@ def main(args):
     loss_f = nn.CrossEntropyLoss()
     criterion = loss_f  #lambda logits, labels: torch.tensor(0)
     ## TASK 11: Define the optimizer
-    optimizer = optim.SGD(model.parameters(), lr=args.learning_rate, momentum=0.9)
+    optimizer = optim.SGD(model.parameters(), lr=args.learning_rate, momentum=args.sgd_momentum)
 
     log_dir = get_summary_writer_log_dir(args)
     print(f"Writing logs to {log_dir}")
@@ -396,6 +426,10 @@ def get_summary_writer_log_dir(args: argparse.Namespace) -> str:
       f"bs={args.batch_size}_"
       f"lr={args.learning_rate}_"
       f"momentum={args.sgd_momentum}_" +
+      f"brightness={args.data_aug_brightness}_" +
+      (f"saturation={args.data_aug_saturation}_" if args.data_aug_saturation is not 0 else "") +
+      (f"contrast={args.data_aug_contrast}_" if args.data_aug_contrast is not 0 else "") +
+      (f"hue={args.data_aug_hue}_" if args.data_aug_hue is not 0 else "") +
       ("hflip_" if args.data_aug_hflip else "") +
       f"run_"
     )
