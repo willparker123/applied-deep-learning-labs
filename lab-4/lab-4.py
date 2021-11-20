@@ -78,7 +78,9 @@ parser.add_argument(
     type=int,
     help="Number of worker processes used to load data.",
 )
-parser.add_argument("--data-aug-hflip", action="store_true")
+parser.add_argument("--data-aug-hflip", action="store_true", help="Applies RandomHorizontalFlip")
+parser.add_argument("--data-aug-random-order", action="store_true", help="Applies Transforms in a random order")
+parser.add_argument("--data-aug-affine", action="store_true", help="Applies RandomAffine transform")
 parser.add_argument(
     "--data-aug-brightness",
     default=0,
@@ -102,6 +104,18 @@ parser.add_argument(
     default=0,
     type=float,
     help="Hue parameter in ColorJitter transform",
+)
+parser.add_argument(
+    "--data-aug-affine-shear",
+    default=0,
+    type=float,
+    help="Shear parameter in RandomAffine transform",
+)
+parser.add_argument(
+    "--data-aug-affine-degrees",
+    default=45,
+    type=float,
+    help="Degrees parameter in RandomAffine transform",
 )
 
 class ImageShape(NamedTuple):
@@ -145,8 +159,13 @@ def main(args):
         transformList.insert(0, transforms.RandomHorizontalFlip())
     if args.data_aug_brightness is not 0:
         transformList.insert(0, transforms.ColorJitter(brightness=args.data_aug_brightness, contrast=args.data_aug_contrast, saturation=args.data_aug_saturation, hue=args.data_aug_hue))
+    if args.data_aug_affine is True:
+        if args.data_aug_affine_shear is not 0:
+            transformList.insert(0, transforms.RandomAffine(degrees=args.data_aug_affine_degrees, translate=(0.1, 0.1), shear=[-args.data_aug_affine_shear, args.data_aug_affine_shear, -args.data_aug_affine_shear, args.data_aug_affine_shear]))
+        else:
+            transformList.insert(0, transforms.RandomAffine(degrees=args.data_aug_affine_degrees, translate=(0.1, 0.1)))
     if len(transformList)>0:
-        transform = transforms.Compose(transformList)
+        transform = transforms.Compose([transforms.RandomOrder(transformList.remove(len(transformList)-1)), transforms.ToTensor()] if args.data_aug_random_order else [transformList])
     args.dataset_root.mkdir(parents=True, exist_ok=True)
     train_dataset = torchvision.datasets.CIFAR10(
         args.dataset_root, train=True, download=True, transform=transform
